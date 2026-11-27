@@ -1,0 +1,231 @@
+Date,Description,Category,Payment Method,Amount
+2026-01-01,Monthly rent,Rent,Net Banking,14000.0
+2026-01-02,Electricity bill,Utilities,UPI,1112.83
+2026-01-02,Metro card,Transport,Net Banking,274.18
+2026-01-02,Mobile recharge,Utilities,UPI,1435.08
+2026-01-03,Doctor,Health,UPI,1623.72
+2026-01-03,Fuel,Transport,UPI,503.04
+2026-01-04,Spotify,Entertainment,UPI,1832.95
+2026-01-05,Amazon order,Shopping,UPI,604.23
+2026-01-06,Flight,Travel,Card,1471.21
+2026-01-08,Zomato,Food,UPI,570.14
+2026-01-09,Lunch with friends,Food,UPI,167.32
+2026-01-10,Concert,Entertainment,Card,340.65
+2026-01-10,Doctor,Health,Net Banking,854.57
+2026-01-10,Fuel,Transport,Card,342.78
+2026-01-16,Concert,Entertainment,Net Banking,277.21
+2026-01-17,Amazon order,Shopping,Cash,3363.67
+2026-01-19,Internet,Utilities,Cash,714.64
+2026-01-20,Clothes,Shopping,UPI,2450.12
+2026-01-21,Movie,Entertainment,Cash,330.25
+2026-01-22,Internet,Utilities,UPI,1708.01
+2026-01-22,Mobile recharge,Utilities,Net Banking,1454.7
+2026-01-25,Auto,Transport,Card,562.63
+2026-01-26,Spotify,Entertainment,Cash,1436.3
+2026-02-01,Monthly rent,Rent,Net Banking,14000.0
+2026-02-02,Movie,Entertainment,UPI,1198.55
+2026-02-04,Internet,Utilities,Net Banking,346.48
+2026-02-04,Spotify,Entertainment,UPI,280.08
+2026-02-05,Swiggy order,Food,Cash,697.47
+2026-02-06,Clothes,Shopping,Net Banking,547.61
+2026-02-06,Spotify,Entertainment,Cash,157.57
+2026-02-07,Lunch with friends,Food,Card,205.74
+2026-02-08,Electricity bill,Utilities,UPI,523.14
+2026-02-09,Movie,Entertainment,Net Banking,1748.37
+2026-02-10,Train tickets,Travel,Card,4062.76
+2026-02-16,Hotel,Travel,Net Banking,4767.44
+2026-02-16,Train tickets,Travel,Card,4483.34
+2026-02-17,Auto,Transport,Card,426.44
+2026-02-18,Internet,Utilities,Cash,1727.3
+2026-02-20,Books,Shopping,Net Banking,815.94
+2026-02-20,Fuel,Transport,Card,395.27
+2026-02-22,Uber,Transport,UPI,311.58
+2026-02-23,Amazon order,Shopping,Cash,3167.44
+2026-02-25,Flight,Travel,Net Banking,4064.17
+2026-02-25,Zomato,Food,Cash,883.23
+2026-02-27,Mobile recharge,Utilities,Card,1050.32
+2026-02-28,Doctor,Health,UPI,1250.28
+2026-03-01,Monthly rent,Rent,Net Banking,14000.0
+2026-03-03,Flight,Travel,Cash,5050.85
+2026-03-05,Movie,Entertainment,UPI,1628.81
+2026-03-05,Zomato,Food,Net Banking,749.07
+2026-03-07,Train tickets,Travel,UPI,2865.05
+2026-03-09,Electricity bill,Utilities,Cash,943.2
+2026-03-12,Gym,Health,UPI,707.06
+2026-03-12,Uber,Transport,Cash,396.41
+2026-03-13,Gym,Health,Net Banking,1909.71
+2026-03-15,Amazon order,Shopping,Card,2533.66
+2026-03-16,Uber,Transport,Cash,154.45
+2026-03-17,Headphones,Shopping,Cash,1389.33
+2026-03-20,Fuel,Transport,Cash,127.31
+2026-03-20,Movie,Entertainment,Net Banking,1832.02
+2026-03-21,Pharmacy,Health,Card,1197.76
+2026-03-23,Train tickets,Travel,Net Banking,8089.89
+2026-03-24,Clothes,Shopping,UPI,3618.48
+2026-03-24,Groceries,Food,Card,894.63
+2026-03-26,Clothes,Shopping,UPI,4121.06
+2026-03-26,Mobile recharge,Utilities,Cash,384.46
+2026-03-26,Movie,Entertainment,Card,1663.92
+2026-03-26,Pharmacy,Health,Card,1390.57
+2026-03-27,Electricity bill,Utilities,UPI,1660.53
+2026-04-01,Monthly rent,Rent,Net Banking,14000.0
+2026-04-01,Movie,Entertainment,Card,411.88
+2026-04-03,Hotel,Travel,Cash,5822.73
+2026-04-06,Mobile recharge,Utilities,Card,500.27
+2026-04-08,Train tickets,Travel,UPI,2977.63
+2026-04-10,Pharmacy,Health,Card,2360.86
+2026-04-11,Clothes,Shopping,Cash,381.83
+2026-04-14,Metro card,Transport,Net Banking,287.59
+2026-04-15,Spotify,Entertainment,UPI,861.04
+2026-04-15,Uber,Transport,UPI,263.02
+2026-04-17,Concert,Entertainment,Net Banking,1600.9
+2026-04-17,Internet,Utilities,Cash,902.98
+2026-04-17,Mobile recharge,Utilities,Net Banking,1037.02
+2026-04-17,Movie,Entertainment,Net Banking,1586.54
+2026-04-18,Swiggy order,Food,Card,269.22
+2026-04-20,Concert,Entertainment,Card,1431.55
+2026-04-20,Spotify,Entertainment,UPI,358.77
+2026-04-22,Groceries,Food,Net Banking,177.03
+2026-04-22,Gym,Health,Card,782.15
+2026-04-23,Auto,Transport,Card,510.4
+2026-04-24,Movie,Entertainment,UPI,753.07
+2026-04-25,Groceries,Food,Cash,709.51
+2026-04-25,Swiggy order,Food,Net Banking,558.15
+2026-05-01,Hotel,Travel,UPI,925.84
+2026-05-01,Monthly rent,Rent,Net Banking,14000.0
+2026-05-02,Headphones,Shopping,UPI,597.04
+2026-05-07,Auto,Transport,Cash,337.41
+2026-05-07,Books,Shopping,Card,304.49
+2026-05-08,Pharmacy,Health,Card,802.36
+2026-05-09,Gym,Health,Card,327.42
+2026-05-09,Mobile recharge,Utilities,Card,316.97
+2026-05-09,Swiggy order,Food,Card,451.75
+2026-05-09,Swiggy order,Food,UPI,745.27
+2026-05-10,Fuel,Transport,Card,191.49
+2026-05-10,Pharmacy,Health,Net Banking,626.31
+2026-05-11,Uber,Transport,Card,266.63
+2026-05-14,Flight,Travel,Cash,4128.77
+2026-05-15,Clothes,Shopping,Cash,1829.39
+2026-05-15,Metro card,Transport,Net Banking,407.65
+2026-05-15,Swiggy order,Food,Cash,895.56
+2026-05-17,Concert,Entertainment,Net Banking,1445.77
+2026-05-17,Doctor,Health,Card,1382.74
+2026-05-18,Books,Shopping,Card,444.68
+2026-05-20,Groceries,Food,UPI,326.27
+2026-05-27,Gym,Health,Cash,1577.19
+2026-05-27,Spotify,Entertainment,Cash,1422.32
+2026-06-01,Fuel,Transport,UPI,312.05
+2026-06-01,Monthly rent,Rent,Net Banking,14000.0
+2026-06-03,Flight,Travel,UPI,6206.26
+2026-06-03,Internet,Utilities,Cash,1029.28
+2026-06-04,Doctor,Health,Card,1754.13
+2026-06-04,Flight,Travel,Card,3355.73
+2026-06-05,Cafe,Food,UPI,413.76
+2026-06-05,Lunch with friends,Food,UPI,427.3
+2026-06-05,Pharmacy,Health,Net Banking,1887.86
+2026-06-08,Gym,Health,Cash,207.62
+2026-06-08,Metro card,Transport,UPI,187.93
+2026-06-09,Train tickets,Travel,Card,2692.04
+2026-06-10,Headphones,Shopping,UPI,2759.45
+2026-06-10,Pharmacy,Health,Card,378.19
+2026-06-11,Auto,Transport,Cash,387.84
+2026-06-15,Gym,Health,Net Banking,376.5
+2026-06-16,Pharmacy,Health,Cash,1865.56
+2026-06-17,Train tickets,Travel,UPI,7576.55
+2026-06-18,Electricity bill,Utilities,UPI,1220.65
+2026-06-23,Books,Shopping,Net Banking,2256.77
+2026-06-24,Lunch with friends,Food,Cash,751.19
+2026-06-26,Concert,Entertainment,Card,307.42
+2026-06-28,Movie,Entertainment,Net Banking,1563.98
+2026-07-01,Monthly rent,Rent,Net Banking,14000.0
+2026-07-03,Metro card,Transport,Card,458.59
+2026-07-10,Gym,Health,Cash,349.45
+2026-07-11,Internet,Utilities,Cash,646.4
+2026-07-11,Train tickets,Travel,Cash,6956.02
+2026-07-12,Headphones,Shopping,Cash,4024.82
+2026-07-12,Pharmacy,Health,Net Banking,2264.72
+2026-07-13,Electricity bill,Utilities,Card,255.57
+2026-07-13,Train tickets,Travel,Card,6646.79
+2026-07-14,Auto,Transport,Net Banking,217.0
+2026-07-14,Books,Shopping,Card,3547.37
+2026-07-14,Gym,Health,Card,1682.33
+2026-07-14,Train tickets,Travel,Net Banking,8290.08
+2026-07-16,Amazon order,Shopping,UPI,1002.8
+2026-07-16,Clothes,Shopping,Card,1017.2
+2026-07-16,Swiggy order,Food,Cash,478.0
+2026-07-17,Hotel,Travel,Cash,3972.16
+2026-07-18,Movie,Entertainment,UPI,241.53
+2026-07-21,Gym,Health,Net Banking,1708.79
+2026-07-22,Internet,Utilities,Net Banking,718.02
+2026-07-25,Internet,Utilities,UPI,684.99
+2026-07-27,Cafe,Food,Card,314.47
+2026-07-28,Mobile recharge,Utilities,UPI,809.1
+2026-08-01,Monthly rent,Rent,Net Banking,14000.0
+2026-08-02,Hotel,Travel,Cash,5509.1
+2026-08-02,Train tickets,Travel,Card,2707.13
+2026-08-03,Uber,Transport,Net Banking,348.22
+2026-08-05,Headphones,Shopping,UPI,1438.29
+2026-08-07,Movie,Entertainment,Net Banking,858.25
+2026-08-08,Metro card,Transport,Card,231.49
+2026-08-09,Internet,Utilities,Card,986.72
+2026-08-11,Groceries,Food,Cash,321.52
+2026-08-11,Internet,Utilities,Net Banking,466.37
+2026-08-13,Fuel,Transport,Net Banking,281.83
+2026-08-17,Headphones,Shopping,Net Banking,1395.7
+2026-08-17,Pharmacy,Health,Net Banking,821.55
+2026-08-18,Uber,Transport,UPI,577.94
+2026-08-20,Train tickets,Travel,UPI,5207.31
+2026-08-21,Cafe,Food,Card,608.65
+2026-08-21,Gym,Health,UPI,250.11
+2026-08-21,Spotify,Entertainment,UPI,333.97
+2026-08-22,Movie,Entertainment,Net Banking,307.26
+2026-08-25,Gym,Health,Net Banking,200.41
+2026-08-26,Metro card,Transport,Card,126.45
+2026-08-27,Mobile recharge,Utilities,Net Banking,1756.97
+2026-08-28,Clothes,Shopping,Card,435.42
+2026-09-01,Mobile recharge,Utilities,Net Banking,634.42
+2026-09-01,Monthly rent,Rent,Net Banking,14000.0
+2026-09-01,Swiggy order,Food,Cash,183.0
+2026-09-02,Doctor,Health,Card,2320.42
+2026-09-02,Pharmacy,Health,Net Banking,1234.18
+2026-09-03,Movie,Entertainment,Net Banking,1944.24
+2026-09-04,Mobile recharge,Utilities,Card,839.2
+2026-09-07,Electricity bill,Utilities,Cash,1395.65
+2026-09-07,Internet,Utilities,Cash,1392.85
+2026-09-07,Swiggy order,Food,Card,444.0
+2026-09-11,Doctor,Health,UPI,2494.32
+2026-09-11,Uber,Transport,Card,405.38
+2026-09-13,Gym,Health,Cash,1217.6
+2026-09-16,Pharmacy,Health,Cash,1445.52
+2026-09-20,Electricity bill,Utilities,Card,1001.83
+2026-09-22,Fuel,Transport,Cash,167.0
+2026-09-22,Mobile recharge,Utilities,Net Banking,375.69
+2026-09-23,Cafe,Food,Net Banking,402.61
+2026-09-24,Spotify,Entertainment,UPI,726.88
+2026-09-25,Books,Shopping,UPI,4298.09
+2026-09-25,Gym,Health,UPI,1063.81
+2026-09-25,Headphones,Shopping,Card,2253.48
+2026-09-27,Hotel,Travel,Net Banking,1519.63
+2026-10-01,Auto,Transport,Card,380.06
+2026-10-01,Clothes,Shopping,UPI,3769.28
+2026-10-01,Monthly rent,Rent,Net Banking,14000.0
+2026-10-02,Spotify,Entertainment,Cash,1859.82
+2026-10-03,Electricity bill,Utilities,Cash,552.16
+2026-10-04,Electricity bill,Utilities,Cash,1218.13
+2026-10-04,Fuel,Transport,Net Banking,593.52
+2026-10-04,Swiggy order,Food,Net Banking,808.6
+2026-10-06,Electricity bill,Utilities,Card,896.1
+2026-10-07,Spotify,Entertainment,UPI,882.73
+2026-10-08,Fuel,Transport,UPI,403.75
+2026-10-08,Uber,Transport,Cash,535.13
+2026-10-09,Pharmacy,Health,Net Banking,769.09
+2026-10-10,Books,Shopping,Cash,1866.48
+2026-10-16,Lunch with friends,Food,Net Banking,736.04
+2026-10-17,Uber,Transport,UPI,405.86
+2026-10-18,Mobile recharge,Utilities,Cash,499.07
+2026-10-20,Cafe,Food,Cash,332.41
+2026-10-20,Train tickets,Travel,Card,4011.82
+2026-10-22,Movie,Entertainment,UPI,1592.54
+2026-10-27,Fuel,Transport,Cash,62.6
+2026-10-27,Internet,Utilities,Card,1688.55
+2026-10-28,Books,Shopping,Net Banking,1819.81
