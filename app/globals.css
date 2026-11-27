@@ -33,7 +33,7 @@ html, body { margin: 0; }
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: var(--font-google-sans), "Google Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: "Google Sans", var(--font-app), system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   font-size: 15px;
   line-height: 1.5;
   text-align: left;
@@ -53,14 +53,21 @@ button, input, select { font: inherit; color: inherit; }
   text-align: left;
 }
 
+/* Sticky Frosted-Glass Topbar */
 .topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding-bottom: 16px;
+  margin: -24px -32px 20px;
+  padding: 16px 32px;
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
-  margin-bottom: 20px;
 }
 .topbar h1 { font-size: 22px; margin: 0; font-weight: 700; letter-spacing: -0.02em; }
 .topbar p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
@@ -110,12 +117,24 @@ button, input, select { font: inherit; color: inherit; }
   padding: 7px 12px;
   cursor: pointer;
   font-size: 13px;
-  transition: border-color 0.15s ease, background-color 0.15s ease;
+  transition: transform 0.12s ease, border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
 }
 .btn:hover:not(:disabled) { border-color: var(--accent); }
+.btn:active:not(:disabled), .chip:active { transform: scale(0.97); }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn.primary { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+.btn.primary:hover:not(:disabled) {
+  box-shadow: 0 6px 16px -4px rgba(37, 99, 235, 0.45);
+  transform: translateY(-1px);
+}
 .btn.link { border: none; background: none; color: var(--accent); padding: 0; }
+
+.theme-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
 
 /* =========================================
    Animated Left-Aligned Upload Hero
@@ -257,13 +276,30 @@ button, input, select { font: inherit; color: inherit; }
 }
 
 /* =========================================
-   Dashboard Controls, Side-by-Side Tools & KPIs
+   Dashboard Controls, Excel Sheet Tabs & KPIs
    ========================================= */
 .alert { border-radius: 8px; padding: 10px 12px; font-size: 13px; border: 1px solid; text-align: left; }
 .alert.error { background: var(--rose-soft); border-color: var(--rose); }
 .alert.warn { background: var(--card); border-color: var(--rose); }
 .alert details summary { cursor: pointer; font-weight: 600; }
 .alert ul { margin: 8px 0 0; padding-left: 18px; max-height: 180px; overflow: auto; color: var(--muted); }
+
+.sheet-tabs {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.chip.active-sheet {
+  background: var(--accent);
+  color: var(--accent-text);
+  border-color: var(--accent);
+  font-weight: 600;
+}
 
 .tools-grid {
   display: grid;

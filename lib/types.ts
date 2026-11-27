@@ -1,67 +1,115 @@
-export type Row = Record<string, string>;
-
-export type ColumnType = "number" | "date" | "category" | "text";
+export type ColumnKind = "number" | "date" | "text";
 
 export interface ColumnInfo {
   name: string;
-  type: ColumnType;
+  kind: ColumnKind;
+  nonEmpty: number;
+  unique: number;
+  sample: string[];
 }
 
-/** A problem found while reading or validating the file. */
-export interface RowError {
-  row: number; // 1-based data row (header excluded)
-  column?: string;
-  message: string;
-}
-
-export interface ParsedCsv {
-  headers: string[];
-  rows: Row[];
-  parseErrors: RowError[];
-}
-
-export interface Dataset extends ParsedCsv {
-  fileName: string;
-  columns: ColumnInfo[];
-}
-
-/** Which columns drive the KPIs and charts. */
 export interface Mapping {
-  metric: string; // required numeric column
-  date: string | null;
+  metric: string;
   category: string | null;
+  date: string | null;
 }
 
-/** A custom formula column created by the user (e.g. Amount * 1.18 or Revenue - Cost). */
-export type FormulaOp = "+" | "-" | "*" | "/";
+export type FormulaOp =
+  | "add"
+  | "subtract"
+  | "multiply"
+  | "divide"
+  | "add_const"
+  | "multiply_const";
 
 export interface FormulaColumn {
   id: string;
   name: string;
-  leftCol: string;
+  left: string;
   op: FormulaOp;
-  rightMode: "column" | "constant";
-  rightCol?: string;
-  rightConstant?: number;
-  decimals: number;
+  right?: string;
+  constant?: number;
 }
 
-/** A row that passed validation. */
+export interface ParseError {
+  row: number;
+  message: string;
+}
+
+export interface SheetData {
+  headers: string[];
+  rows: Record<string, string>[];
+  parseErrors: ParseError[];
+}
+
+export interface ParsedCsv {
+  headers: string[];
+  rows: Record<string, string>[];
+  parseErrors: ParseError[];
+  sheets?: Record<string, SheetData>;
+  activeSheet?: string;
+}
+
+export interface RowError {
+  row: number;
+  column: string;
+  value: string;
+  reason: string;
+}
+
 export interface DataRecord {
   id: number;
-  row: number;
-  date: number | null; // UTC timestamp (ms)
+  metric: number;
   category: string;
-  amount: number;
-  raw: Row;
+  date: number | null;
+  raw: Record<string, string>;
 }
 
 export interface Filters {
-  categories: string[]; // empty = all
-  from: string; // yyyy-mm-dd or ""
-  to: string;
-  min: string;
-  max: string;
   search: string;
+  categories: string[];
+  dateFrom: string;
+  dateTo: string;
+  minVal: string;
+  maxVal: string;
   outliersOnly: boolean;
+}
+
+export interface Kpis {
+  total: number;
+  count: number;
+  average: number;
+  median: number;
+  min: number;
+  max: number;
+  topCategory: { name: string; total: number } | null;
+}
+
+export interface CategoryPoint {
+  name: string;
+  total: number;
+  count: number;
+}
+
+export interface MonthPoint {
+  month: string;
+  total: number;
+  count: number;
+}
+
+export interface OutlierSummary {
+  count: number;
+  lowerFence: number | null;
+  upperFence: number | null;
+  q1: number | null;
+  q3: number | null;
+  outlierIds: number[];
+}
+
+export interface DataHealth {
+  totalRows: number;
+  validRows: number;
+  duplicateRows: number;
+  completenessPct: number;
+  columnMissing: { column: string; missing: number; pct: number; kind: ColumnKind }[];
 }

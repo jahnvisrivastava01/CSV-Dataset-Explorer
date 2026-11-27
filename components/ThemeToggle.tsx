@@ -3,26 +3,30 @@
 import { useEffect, useState } from "react";
 
 export default function ThemeToggle() {
-  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [dark, setDark] = useState(false);
 
   useEffect(() => {
-    setTheme(document.documentElement.dataset.theme === "dark" ? "dark" : "light");
+    setDark(document.documentElement.getAttribute("data-theme") === "dark");
   }, []);
 
   function toggle() {
-    const next = theme === "dark" ? "light" : "dark";
-    document.documentElement.dataset.theme = next;
-    setTheme(next);
+    const next = !dark;
+    setDark(next);
+    const theme = next ? "dark" : "light";
+    document.documentElement.setAttribute("data-theme", theme);
     try {
-      localStorage.setItem("theme", next);
-    } catch {
-      /* storage can be unavailable */
-    }
+      localStorage.setItem("dataset-explorer-theme", theme);
+    } catch {}
   }
 
   return (
-    <button className="btn" onClick={toggle} aria-label="Toggle light and dark theme">
-      {theme === "dark" ? "Light mode" : "Dark mode"}
+    <button
+      type="button"
+      className="btn theme-btn"
+      onClick={toggle}
+      aria-label="Toggle color theme"
+    >
+      {dark ? "☀️ Light mode" : "🌙 Dark mode"}
     </button>
   );
 }

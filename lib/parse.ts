@@ -1,251 +1,296 @@
 import Papa from "papaparse";
+import * as XLSX from "xlsx";
 import type {
   ColumnInfo,
+  ColumnKind,
   DataRecord,
   FormulaColumn,
   Mapping,
   ParsedCsv,
-  Row,
+  ParseError,
   RowError,
+  SheetData,
 } from "./types";
 
-/* ---------- value parsers ---------- */
+const MAX_ROWS = 50_000;
 
-/** "$1,250.50", "(300)", "₹ 99" -> number. Returns null when not numeric. */
-export function parseNumber(value: string | undefined): number | null {
-  if (value === undefined) return null;
-  let s = value.trim();
+export function parseNumber(raw: string): number | null {
+  const s = raw.trim();
   if (!s) return null;
-  let negative = false;
-  if (/^\(.*\)$/.test(s)) {
-    negative = true;
-    s = s.slice(1, -1);
-  }
-  s = s.replace(/[₹$€£\s,]/g, "");
-  if (!/^[-+]?(\d+\.?\d*|\.\d+)(e[-+]?\d+)?$/i.test(s)) return null;
-  const n = Number(s);
+  const negative = /^\(.*\)$/.test(s);
+  const cleaned = s.replace(/[$€£¥₹,\s()]/g, "");
+  if (!cleaned || cleaned === "-" || cleaned === "+") return null;
+  const n = Number(cleaned);
   if (!Number.isFinite(n)) return null;
-  return negative ? -n : n;
+  return negative ? -Math.abs(n) : n;
 }
 
-function utc(y: number, m: number, d: number): number | null {
-  const t = Date.UTC(y, m - 1, d);
-  const dt = new Date(t);
-  const ok =
-    dt.getUTCFullYear() === y &&
-    dt.getUTCMonth() === m - 1 &&
-    dt.getUTCDate() === d;
-  return ok ? t : null;
-}
-
-const ISO = /^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})(?:[T\s].*)?$/;
-const SLASH = /^(\d{1,2})[-/.](\d{1,2})[-/.](\d{2}|\d{4})(?:\s.*)?$/;
-
-/**
- * Parses common date formats into a UTC timestamp.
- * yyyy-mm-dd, dd/mm/yyyy, mm/dd/yyyy and "Jan 5, 2026" are supported.
- * For ambiguous values like 03/04/2026 we assume month/day (US style).
- */
-export function parseDate(value: string | undefined): number | null {
-  if (value === undefined) return null;
-  const s = value.trim();
+export function parseDate(raw: string): number | null {
+  const s = raw.trim();
   if (!s) return null;
 
-  let m = ISO.exec(s);
-  if (m) return utc(Number(m[1]), Number(m[2]), Number(m[3]));
+  let m = /^(\d{4})[-/](\d{1,2})[-/](\d{1,2})(?:[T\s].*)?$/.exec(s);
+  if (m) return validUtc(+m[1], +m[2], +m[3]);
 
-  m = SLASH.exec(s);
-  if (m) {
-    const a = Number(m[1]);
-    const b = Number(m[2]);
-    let y = Number(m[3]);
-    if (m[3]!.length === 2) y += 2000;
-    if (a > 12) return utc(y, b, a); // dd/mm/yyyy
-    return utc(y, a, b); // mm/dd/yyyy
-  }
+  m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(s);
+  if (m) return validUtc(+m[3], +m[1], +m[2]);
 
-  if (/[a-z]/i.test(s)) {
-    const p = Date.parse(s);
-    if (!Number.isNaN(p)) {
-      const d = new Date(p);
-      return Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
-    }
-  }
-  return null;
+  m = /^(\d{1,2})-(\d{1,2})-(\d{4})$/.exec(s);
+  if (m) return validUtc(+m[3], +m[2], +m[1]);
+
+  if (/^\d+$/.test(s)) return null;
+
+  const t = Date.parse(s);
+  if (!Number.isFinite(t)) return null;
+  const d = new Date(t);
+  return validUtc(d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate());
 }
 
-/* ---------- CSV reading ---------- */
+function validUtc(y: number, m: number, d: number): number | null {
+  if (y < 1900 || y > 2200 || m < 1 || m > 12 || d < 1 || d > 31) return null;
+  const ms = Date.UTC(y, m - 1, d);
+  const check = new Date(ms);
+  if (
+    check.getUTCFullYear() !== y ||
+    check.getUTCMonth() !== m - 1 ||
+    check.getUTCDate() !== d
+  ) {
+    return null;
+  }
+  return ms;
+}
 
-export function parseCsvFile(file: File): Promise<ParsedCsv> {
+function parseCsvOnly(file: File): Promise<ParsedCsv> {
   return new Promise((resolve, reject) => {
-    Papa.parse<Row>(file, {
+    const parseErrors: ParseError[] = [];
+    Papa.parse<Record<string, string>>(file, {
       header: true,
       skipEmptyLines: "greedy",
       transformHeader: (h) => h.trim(),
       complete: (res) => {
-        const headers = (res.meta.fields ?? []).filter((h) => h !== "");
-        const parseErrors: RowError[] = res.errors
-          .filter((e) => e.code !== "UndetectableDelimiter")
-          .map((e) => ({
-            row: (e.row ?? 0) + 1,
+        const headers = (res.meta.fields ?? []).filter(Boolean);
+        for (const e of res.errors) {
+          parseErrors.push({
+            row: typeof e.row === "number" ? e.row + 2 : 0,
             message: e.message,
-          }));
-        resolve({ headers, rows: res.data, parseErrors });
+          });
+        }
+        const rows = res.data.slice(0, MAX_ROWS);
+        if (res.data.length > MAX_ROWS) {
+          parseErrors.push({
+            row: MAX_ROWS,
+            message: `Only the first ${MAX_ROWS.toLocaleString()} rows were loaded.`,
+          });
+        }
+        resolve({ headers, rows, parseErrors });
       },
       error: (err) => reject(err),
     });
   });
 }
 
-/* ---------- formula evaluation ---------- */
+export async function parseDatasetFile(file: File): Promise<ParsedCsv> {
+  if (/\.(xlsx|xls)$/i.test(file.name)) {
+    const buffer = await file.arrayBuffer();
+    const workbook = XLSX.read(buffer, { type: "array", cellDates: true });
+    const sheets: Record<string, SheetData> = {};
 
-export function applyFormulaColumns(
-  baseHeaders: string[],
-  baseRows: Row[],
-  formulas: FormulaColumn[]
-): { headers: string[]; rows: Row[] } {
-  if (formulas.length === 0) {
-    return { headers: baseHeaders, rows: baseRows };
-  }
+    for (const name of workbook.SheetNames) {
+      const sheet = workbook.Sheets[name];
+      const rawMatrix = XLSX.utils.sheet_to_json<unknown[]>(sheet, {
+        header: 1,
+        defval: "",
+        raw: false,
+      });
 
-  const headers = [...baseHeaders];
-  for (const f of formulas) {
-    if (!headers.includes(f.name)) headers.push(f.name);
-  }
+      if (rawMatrix.length < 2) continue;
 
-  const rows = baseRows.map((raw) => {
-    const next: Row = { ...raw };
-    for (const f of formulas) {
-      const left = parseNumber(next[f.leftCol]);
-      const right =
-        f.rightMode === "column"
-          ? f.rightCol
-            ? parseNumber(next[f.rightCol])
-            : null
-          : f.rightConstant ?? null;
+      const headers = (rawMatrix[0] as unknown[]).map((h, i) => {
+        const clean = String(h ?? "").trim();
+        return clean || `Column_${i + 1}`;
+      });
 
-      if (left === null || right === null) {
-        next[f.name] = "";
-        continue;
+      const rows: Record<string, string>[] = [];
+      for (let r = 1; r < rawMatrix.length; r++) {
+        if (rows.length >= MAX_ROWS) break;
+        const line = rawMatrix[r] as unknown[];
+        if (!line || line.every((cell) => String(cell ?? "").trim() === "")) continue;
+        const obj: Record<string, string> = {};
+        headers.forEach((h, idx) => {
+          obj[h] = String(line[idx] ?? "").trim();
+        });
+        rows.push(obj);
       }
 
-      let val: number | null = null;
-      if (f.op === "+") val = left + right;
-      else if (f.op === "-") val = left - right;
-      else if (f.op === "*") val = left * right;
-      else if (f.op === "/") val = right === 0 ? null : left / right;
-
-      next[f.name] =
-        val === null || !Number.isFinite(val)
-          ? ""
-          : Number(val.toFixed(f.decimals)).toString();
+      if (rows.length > 0) {
+        sheets[name] = { headers, rows, parseErrors: [] };
+      }
     }
-    return next;
-  });
 
-  return { headers, rows };
+    const sheetNames = Object.keys(sheets);
+    if (sheetNames.length === 0) {
+      throw new Error("No non-empty sheets with data rows found in this Excel workbook.");
+    }
+
+    const firstSheet = sheetNames[0];
+    return {
+      ...sheets[firstSheet],
+      sheets,
+      activeSheet: firstSheet,
+    };
+  }
+
+  return parseCsvOnly(file);
 }
 
-/* ---------- column inference ---------- */
+export const parseCsvFile = parseDatasetFile;
 
-const SAMPLE = 500;
-
-export function inferColumns(headers: string[], rows: Row[]): ColumnInfo[] {
+export function inferColumns(
+  headers: string[],
+  rows: Record<string, string>[]
+): ColumnInfo[] {
+  const sampleRows = rows.slice(0, 200);
   return headers.map((name) => {
-    const values: string[] = [];
-    for (const r of rows) {
-      const v = (r[name] ?? "").trim();
-      if (v) values.push(v);
-      if (values.length >= SAMPLE) break;
-    }
-    if (values.length === 0) return { name, type: "text" };
-
-    const share = (fn: (v: string) => unknown) =>
-      values.filter((v) => fn(v) !== null).length / values.length;
-
-    if (share(parseDate) >= 0.9) return { name, type: "date" };
-    if (share(parseNumber) >= 0.9) return { name, type: "number" };
-
+    const values = sampleRows
+      .map((r) => (r[name] ?? "").trim())
+      .filter((v) => v.length > 0);
+    const nonEmpty = values.length;
     const unique = new Set(values).size;
-    if (unique <= Math.max(25, values.length * 0.25)) {
-      return { name, type: "category" };
+    let nums = 0;
+    let dates = 0;
+    for (const v of values) {
+      if (parseNumber(v) !== null) nums++;
+      if (parseDate(v) !== null) dates++;
     }
-    return { name, type: "text" };
+    let kind: ColumnKind = "text";
+    if (nonEmpty > 0) {
+      if (nums / nonEmpty >= 0.8) kind = "number";
+      else if (dates / nonEmpty >= 0.8) kind = "date";
+    }
+    return {
+      name,
+      kind,
+      nonEmpty,
+      unique,
+      sample: Array.from(new Set(values)).slice(0, 3),
+    };
   });
 }
 
 export function defaultMapping(columns: ColumnInfo[]): Mapping | null {
-  const numbers = columns.filter((c) => c.type === "number");
-  if (numbers.length === 0) return null;
+  const numCols = columns.filter((c) => c.kind === "number");
+  if (numCols.length === 0) return null;
 
-  const idLike = /(^id$|_id$|\bid$|index|^row|zip|postal|phone)/i;
-  const metricHint = /amount|price|sales|cost|total|expense|revenue|spend|value/i;
-  const metric =
-    numbers.find((c) => metricHint.test(c.name)) ??
-    numbers.find((c) => !idLike.test(c.name)) ??
-    numbers[0]!;
+  const metricHint = /amount|total|price|revenue|sales|cost|spend|value|qty|quantity|balance|profit|fee/i;
+  const metric = (numCols.find((c) => metricHint.test(c.name)) ?? numCols[0]).name;
 
-  const categories = columns.filter(
-    (c) => c.type === "category" && c.name !== metric.name
-  );
-  const fallbackText = columns.filter(
-    (c) => c.type === "text" && c.name !== metric.name
-  );
+  const dateCol = columns.find((c) => c.kind === "date");
 
-  const category =
-    categories.find((c) => /categor|type|dept|segment|group|author|genre/i.test(c.name)) ??
-    categories[0] ??
-    fallbackText[0] ??
-    null;
+  const textCols = columns.filter((c) => c.kind === "text" && c.unique > 1);
+  const catHint = /category|type|department|dept|region|status|group|segment|product|item|channel/i;
+  const preferred =
+    textCols.find((c) => catHint.test(c.name) && c.unique <= 50) ??
+    textCols.find((c) => c.unique <= 25) ??
+    textCols[0];
 
-  const date = columns.find((c) => c.type === "date") ?? null;
-
-  return { metric: metric.name, date: date?.name ?? null, category: category?.name ?? null };
+  return {
+    metric,
+    category: preferred ? preferred.name : null,
+    date: dateCol ? dateCol.name : null,
+  };
 }
 
-/* ---------- validation ---------- */
+export function applyFormulaColumns(
+  headers: string[],
+  rows: Record<string, string>[],
+  formulas: FormulaColumn[]
+): { headers: string[]; rows: Record<string, string>[] } {
+  if (formulas.length === 0) return { headers, rows };
 
-export interface BuildResult {
-  records: DataRecord[];
-  errors: RowError[];
+  const outHeaders = [...headers];
+  for (const f of formulas) {
+    if (!outHeaders.includes(f.name)) outHeaders.push(f.name);
+  }
+
+  const outRows = rows.map((row) => {
+    const copy: Record<string, string> = { ...row };
+    for (const f of formulas) {
+      const a = parseNumber(copy[f.left] ?? "");
+      const b = f.right ? parseNumber(copy[f.right] ?? "") : null;
+      const k = typeof f.constant === "number" && Number.isFinite(f.constant) ? f.constant : null;
+
+      let res: number | null = null;
+      if (a !== null) {
+        switch (f.op) {
+          case "add":
+            if (b !== null) res = a + b;
+            break;
+          case "subtract":
+            if (b !== null) res = a - b;
+            break;
+          case "multiply":
+            if (b !== null) res = a * b;
+            break;
+          case "divide":
+            if (b !== null && b !== 0) res = a / b;
+            break;
+          case "add_const":
+            if (k !== null) res = a + k;
+            break;
+          case "multiply_const":
+            if (k !== null) res = a * k;
+            break;
+        }
+      }
+      copy[f.name] = res !== null && Number.isFinite(res) ? String(Math.round(res * 10000) / 10000) : "";
+    }
+    return copy;
+  });
+
+  return { headers: outHeaders, rows: outRows };
 }
 
-/** Validates every row against the chosen mapping. Bad rows are reported, not silently dropped. */
-export function buildRecords(rows: Row[], mapping: Mapping): BuildResult {
+export function buildRecords(
+  rows: Record<string, string>[],
+  mapping: Mapping
+): { records: DataRecord[]; errors: RowError[] } {
   const records: DataRecord[] = [];
   const errors: RowError[] = [];
 
-  rows.forEach((raw, i) => {
-    const row = i + 1;
-
-    const amount = parseNumber(raw[mapping.metric]);
-    if (amount === null) {
+  rows.forEach((raw, idx) => {
+    const rowNum = idx + 2;
+    const metricRaw = raw[mapping.metric] ?? "";
+    const metric = parseNumber(metricRaw);
+    if (metric === null) {
       errors.push({
-        row,
+        row: rowNum,
         column: mapping.metric,
-        message: `"${raw[mapping.metric] ?? ""}" is not a valid number`,
+        value: metricRaw,
+        reason: metricRaw.trim() ? "not a number" : "missing number",
       });
       return;
     }
 
     let date: number | null = null;
     if (mapping.date) {
-      date = parseDate(raw[mapping.date]);
-      if (date === null) {
-        errors.push({
-          row,
-          column: mapping.date,
-          message: `"${raw[mapping.date] ?? ""}" is not a valid date`,
-        });
-        return;
+      const dateRaw = raw[mapping.date] ?? "";
+      if (dateRaw.trim()) {
+        date = parseDate(dateRaw);
+        if (date === null) {
+          errors.push({
+            row: rowNum,
+            column: mapping.date,
+            value: dateRaw,
+            reason: "unrecognized date",
+          });
+        }
       }
     }
 
-    const category = mapping.category
-      ? (raw[mapping.category] ?? "").trim() || "Uncategorized"
-      : "All";
+    const catRaw = mapping.category ? (raw[mapping.category] ?? "").trim() : "";
+    const category = mapping.category ? catRaw || "(Uncategorized)" : "All rows";
 
-    records.push({ id: i, row, date, category, amount, raw });
+    records.push({ id: idx + 1, metric, category, date, raw });
   });
 
   return { records, errors };

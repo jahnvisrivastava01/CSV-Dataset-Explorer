@@ -48,7 +48,7 @@ export default function Page() {
   const [loading, setLoading] = useState(false);
   const [hydrated, setHydrated] = useState(false);
 
-  // Restore saved CSV, formulas, mapping, and filters before rendering Dropzone
+  // Restore saved dataset, formulas, mapping, and filters before rendering Dropzone
   useEffect(() => {
     try {
       const saved = sessionStorage.getItem(STORAGE_KEY);
@@ -81,7 +81,7 @@ export default function Page() {
         JSON.stringify({ rawDataset, formulas, mapping, filters })
       );
     } catch {
-      /* ignore quota exceeded for huge CSVs (>5MB) */
+      /* ignore quota exceeded for huge files (>5MB) */
     }
   }, [rawDataset, formulas, mapping, filters, hydrated]);
 
@@ -89,8 +89,8 @@ export default function Page() {
     setError(null);
     setLoading(true);
     try {
-      if (!/\.(csv|tsv|txt)$/i.test(file.name)) {
-        throw new Error("Please choose a .csv file.");
+      if (!/\.(csv|tsv|txt|xlsx|xls)$/i.test(file.name)) {
+        throw new Error("Please choose a .csv or .xlsx file.");
       }
       const parsed = await parseCsvFile(file);
       if (parsed.headers.length === 0 || parsed.rows.length === 0) {
@@ -174,6 +174,26 @@ export default function Page() {
     setFilters(emptyFilters);
   }
 
+  function switchSheet(sheetName: string) {
+    if (!rawDataset?.sheets?.[sheetName]) return;
+    const nextSheet = rawDataset.sheets[sheetName];
+    const cols = inferColumns(nextSheet.headers, nextSheet.rows);
+    const m = defaultMapping(cols);
+    if (!m) {
+      setError(`Sheet "${sheetName}" has no numeric column to chart.`);
+      return;
+    }
+    setError(null);
+    setRawDataset({
+      ...rawDataset,
+      ...nextSheet,
+      activeSheet: sheetName,
+    });
+    setFormulas([]);
+    setMapping(m);
+    setFilters(emptyFilters);
+  }
+
   function addFormula(f: FormulaColumn) {
     setFormulas((prev) => [...prev, f]);
     setMapping((prev) => (prev ? { ...prev, metric: f.name } : prev));
@@ -197,7 +217,7 @@ export default function Page() {
       <header className="topbar">
         <div>
           <h1>Dataset Explorer</h1>
-          <p>Drop in a CSV. Rows are checked, transformed with formulas, charted, and filterable.</p>
+          <p>Drop in a CSV or Excel workbook. Rows are checked, transformed with formulas, charted, and filterable.</p>
         </div>
         <ThemeToggle />
       </header>
@@ -211,7 +231,9 @@ export default function Page() {
             <div className="card">
               <div className="fileline">
                 <span>
-                  <b>{computed.fileName}</b> · {computed.rows.length} rows · {computed.headers.length} columns
+                  <b>{computed.fileName}</b>
+                  {rawDataset?.activeSheet ? ` (${rawDataset.activeSheet})` : ""} ·{" "}
+                  {computed.rows.length} rows · {computed.headers.length} columns
                 </span>
                 <button
                   className="btn"
@@ -225,6 +247,25 @@ export default function Page() {
                   Load another file
                 </button>
               </div>
+
+              {rawDataset?.sheets && Object.keys(rawDataset.sheets).length > 1 && (
+                <div className="sheet-tabs" role="tablist" aria-label="Excel sheets">
+                  <span className="muted">Sheets:</span>
+                  {Object.keys(rawDataset.sheets).map((sheetName) => (
+                    <button
+                      key={sheetName}
+                      type="button"
+                      role="tab"
+                      aria-selected={rawDataset.activeSheet === sheetName}
+                      className={`chip${rawDataset.activeSheet === sheetName ? " active-sheet" : ""}`}
+                      onClick={() => switchSheet(sheetName)}
+                    >
+                      {sheetName}
+                    </button>
+                  ))}
+                </div>
+              )}
+
               <ColumnMapper columns={computed.columns} mapping={mapping} onChange={changeMapping} />
             </div>
 
@@ -307,7 +348,7 @@ export default function Page() {
           <b>Dataset Explorer</b> · Built by <b>Jahnvi Srivastava</b>
         </span>
         <span className="muted">
-          Client-side CSV parsing, formula engine &amp; statistical profiling
+          Client-side CSV &amp; Excel parsing, formula engine &amp; statistical profiling
         </span>
       </footer>
     </main>
